@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Safety Mid-Training: Internalizing LLM Safety as a Foundational Capability.">
+  <meta name="keywords" content="LLM safety, mid-training, alignment, safety reasoning">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Safety Mid-Training</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/project-page.css">
+</head>
+<body>
+
+<section class="hero publication-header">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">
+            Safety Mid-Training: Internalizing LLM Safety as a Foundational Capability
+          </h1>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Zhengyue Zhao<sup>1</sup></span>
+            <span class="author-block">Liwei Jiang<sup>2</sup></span>
+            <span class="author-block">Yejin Choi<sup>3</sup></span>
+            <span class="author-block">Chaowei Xiao<sup>1</sup></span>
+          </div>
+
+          <div class="is-size-5 publication-authors publication-affiliations">
+            <span class="author-block"><sup>1</sup>Johns Hopkins University</span>
+            <span class="author-block"><sup>2</sup>University of Washington</span>
+            <span class="author-block"><sup>3</sup>Stanford University</span>
+          </div>
+
+          <div class="publication-links">
+            <span class="link-block">
+              <a class="button is-normal is-rounded is-dark" href="https://github.com/SaFo-Lab/Safety-Midtrain" target="_blank" rel="noreferrer"><img class="brand-icon github-icon" src="static/images/github.svg" alt="">Code</a>
+            </span>
+            <span class="link-block">
+              <a class="button is-normal is-rounded is-dark" href="#datasets"><img class="brand-icon huggingface-icon" src="static/images/huggingface.svg" alt="">Datasets</a>
+            </span>
+            <span class="link-block">
+              <a class="button is-normal is-rounded is-dark" href="#models"><img class="brand-icon huggingface-icon" src="static/images/huggingface.svg" alt="">Models</a>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body has-text-centered">
+      <figure class="publication-figure figure-wide">
+        <img src="public/paper/method-overview.png" alt="Safety mid-training overview and on-policy data construction pipeline">
+        <figcaption class="publication-caption">
+          Safety mid-training adds a pre-training-style stage that develops a common reasoning
+          process for safe and useful responses before supervised fine-tuning or reinforcement learning.
+        </figcaption>
+      </figure>
+      <p class="teaser-copy">
+        Across model scales, this stage lowers attack success rates, improves utility, and retains
+        its advantage after SFT and GRPO.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-light">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Most safety alignment for large language models (LLMs) is introduced during
+              post-training, when models are fine-tuned to refuse harmful requests. Although
+              effective, this approach can produce safety behavior that is shallow, vulnerable to
+              subsequent tuning, and in tension with general capability. We introduce
+              <strong>safety mid-training</strong>, an intermediate stage that develops
+              safety-relevant reasoning with a pre-training-style objective.
+            </p>
+            <p>
+              The method uses the same reasoning process for safety and utility: identify the
+              user's intent or task goal, apply relevant knowledge, consider possible consequences,
+              and verify that the response is appropriate. Our on-policy data pipeline produces
+              185K examples containing about 200M tokens for Qwen3-1.7B, 4B, and 8B base models.
+              Across nine safety and nine utility benchmarks, safety mid-training reduces average
+              attack success rate by 71% to 82% relative to the corresponding base models while
+              improving utility. These gains persist after SFT and GRPO and extend to Llama-3.2
+              and Nemotron-3-8B.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Safety Mid-Training</h2>
+        <div class="content has-text-justified">
+          <p>
+            Given safety and utility prompts, the target model generates structured documents and
+            on-policy reasoning traces. A Qwen3-32B judge filters candidates for faithfulness,
+            logical coherence, and consistency with the reference answer. The accepted documents
+            and traces are then mixed for continued pre-training with the standard causal language
+            modeling objective.
+          </p>
+          <ol>
+            <li><strong>Structured document:</strong> each document records the task, intent, relevant knowledge, constraints, consequences, best feasible path, and verification criteria.</li>
+            <li><strong>On-policy reasoning:</strong> the model generates its own traces, keeping the training data close to its native reasoning distribution.</li>
+            <li><strong>Quality filtering:</strong> a judge retains traces that are faithful, coherent, and consistent with the reference answer.</li>
+            <li><strong>Continued pre-training:</strong> the model develops safety-relevant reasoning before post-training, rather than learning only a refusal policy.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-light">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3 has-text-centered">Main Results</h2>
+          <div class="content">
+            <p class="has-text-centered">
+              Before supervised fine-tuning, safety mid-training improves both safety and utility at every Qwen3 scale.
+            </p>
+          </div>
+
+          <div class="table-container">
+            <table class="table is-striped" aria-label="Qwen3 results before supervised fine-tuning">
+              <thead>
+                <tr><th>Model</th><th>Base ASR</th><th>Ours ASR</th><th>Base Utility</th><th>Ours Utility</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Qwen3-1.7B</td><td>30.4</td><td class="best">8.8</td><td>36.0</td><td class="best">59.5</td></tr>
+                <tr><td>Qwen3-4B</td><td>37.3</td><td class="best">8.0</td><td>47.6</td><td class="best">74.4</td></tr>
+                <tr><td>Qwen3-8B</td><td>29.9</td><td class="best">5.3</td><td>72.4</td><td class="best">78.8</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="result-note">Lower ASR is better; higher utility is better.</p>
+
+          <figure class="publication-figure figure-medium">
+            <img src="public/paper/safety-utility.png" alt="Safety and utility results across Qwen3 and Llama-3.2 models">
+            <figcaption class="publication-caption">
+              All evaluated Qwen3 and Llama-3.2 models shift toward lower ASR and higher utility after mid-training.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3 has-text-centered">Robustness after Supervised Fine-Tuning</h2>
+        <div class="content">
+          <p class="has-text-centered">
+            Mid-trained Qwen3-8B continues to outperform the base model under balanced, pure-safety, and pure-general SFT.
+          </p>
+        </div>
+
+        <div class="table-container">
+          <table class="table is-striped" aria-label="Qwen3-8B results after supervised fine-tuning">
+            <thead>
+              <tr><th>SFT Mix</th><th>Base ASR</th><th>Ours ASR</th><th>Base Utility</th><th>Ours Utility</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Balanced</td><td>17.0</td><td class="best">3.7</td><td>73.7</td><td class="best">78.5</td></tr>
+              <tr><td>Pure safety</td><td>13.5</td><td class="best">3.7</td><td>72.6</td><td class="best">79.2</td></tr>
+              <tr><td>Pure general</td><td>16.5</td><td class="best">6.3</td><td>72.1</td><td class="best">78.8</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="result-note">
+          Pure-general SFT contains no safety examples, providing a direct test of whether safety behavior was established during mid-training.
+        </p>
+
+        <figure class="publication-figure figure-compact">
+          <img src="public/paper/sft-stability.png" alt="Safety robustness as safety data is removed from supervised fine-tuning">
+          <figcaption class="publication-caption">
+            Mid-trained models maintain substantially lower ASR as safety examples are removed from SFT.
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-light">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3 has-text-centered">Reinforcement Learning</h2>
+          <div class="columns is-centered">
+            <div class="column is-four-fifths">
+              <div class="content has-text-justified">
+                <p>
+                  Mid-training gives GRPO a stronger initialization. On Qwen3-4B, MT + GRPO reaches
+                  98.1 safety and 77.9 utility, compared with 92.2 safety and 73.9 utility for
+                  Base + GRPO. On Qwen3-1.7B, MT + GRPO reaches 96.6 safety and 66.9 utility.
+                </p>
+              </div>
+            </div>
+          </div>
+          <figure class="publication-figure figure-panorama">
+            <img src="public/paper/grpo-trajectory.png" alt="GRPO trajectories for base and safety-mid-trained Qwen3 models">
+            <figcaption class="publication-caption">
+              Safety-mid-trained models maintain their advantage throughout GRPO with both balanced and general-only data.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full-width">
+        <h2 class="title is-3 has-text-centered">Transfer and Generalization</h2>
+        <div class="columns is-centered">
+          <div class="column is-four-fifths">
+            <div class="content has-text-justified">
+              <p>
+                The gains are not limited to Qwen3. On-policy mid-training also improves
+                Llama-3.2-3B. In a stricter cross-model experiment, we train Nemotron-3-8B using
+                data originally generated for Qwen3-4B, directly testing whether a mid-training
+                corpus transfers across model families.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="table is-striped" aria-label="Cross-model generalization before supervised fine-tuning">
+            <thead>
+              <tr><th>Target Model</th><th>Data Origin</th><th>Base ASR</th><th>Ours ASR</th><th>Base Utility</th><th>Ours Utility</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Llama-3.2-3B</td><td>On-policy</td><td>35.3</td><td class="best">5.9</td><td>19.5</td><td class="best">42.0</td></tr>
+              <tr><td>Nemotron-3-8B</td><td>Qwen3-4B</td><td>24.5</td><td class="best">4.4</td><td>26.1</td><td class="best">64.4</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="has-text-centered">Nemotron-3-8B after SFT</h3>
+        <div class="table-container">
+          <table class="table is-striped" aria-label="Nemotron-3-8B transfer results after supervised fine-tuning">
+            <thead>
+              <tr><th>SFT Mix</th><th>Base ASR</th><th>Ours ASR</th><th>Base Utility</th><th>Ours Utility</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Balanced</td><td>31.9</td><td class="best">14.0</td><td>39.9</td><td class="best">59.9</td></tr>
+              <tr><td>Pure safety</td><td>2.5</td><td class="best">1.6</td><td>23.7</td><td class="best">60.2</td></tr>
+              <tr><td>Pure general</td><td>4.9</td><td class="best">3.4</td><td>45.3</td><td class="best">60.9</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="result-note">
+          Using the Qwen3-4B corpus improves Nemotron under all three SFT mixtures, including
+          pure-general SFT with no safety examples. This provides direct evidence that the
+          mid-training data transfers across model families.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hero is-light">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-full-width">
+          <h2 class="title is-3 has-text-centered">Ablations</h2>
+          <div class="columns is-centered figure-pair">
+            <div class="column is-half">
+              <figure class="publication-figure">
+                <img src="public/paper/schema-ablation.png" alt="Ablation of intent, knowledge, and consequence fields">
+                <figcaption class="publication-caption">
+                  Removing intent, knowledge, or consequence information degrades both safety and utility.
+                </figcaption>
+              </figure>
+            </div>
+            <div class="column is-half">
+              <figure class="publication-figure">
+                <img src="public/paper/corpus-ratio.png" alt="Safety and utility as the unsafe prompt ratio changes">
+                <figcaption class="publication-caption">
+                  A 25% unsafe-prompt ratio provides the best overall safety-utility balance.
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="resources">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Resources</h2>
+        <div class="content">
+          <h3>Code</h3>
+          <ul>
+            <li><a class="resource-link" href="https://github.com/SaFo-Lab/Safety-Midtrain" target="_blank" rel="noreferrer"><img class="brand-icon github-icon" src="static/images/github.svg" alt="">Safety-Midtrain repository</a></li>
+          </ul>
+
+          <h3 id="datasets">Datasets</h3>
+          <ul class="resource-list">
+            <li><a class="resource-link" href="https://huggingface.co/datasets/Ethan271/midtrain-document-data" target="_blank" rel="noreferrer"><img class="brand-icon huggingface-icon" src="static/images/huggingface.svg" alt="">Mid-training document dataset</a></li>
+            <li><a class="resource-link" href="https://huggingface.co/datasets/Ethan271/midtrain-reasoning-data" target="_blank" rel="noreferrer"><img class="brand-icon huggingface-icon" src="static/images/huggingface.svg" alt="">Mid-training reasoning dataset</a></li>
+          </ul>
+
+          <h3 id="models">Models</h3>
+          <ul class="resource-list">
+            <li><a class="resource-link" href="https://huggingface.co/Ethan271/qwen3-1.7b-safety-midtrain" target="_blank" rel="noreferrer"><img class="brand-icon huggingface-icon" src="static/images/huggingface.svg" alt="">Qwen3-1.7B Safety Midtrain</a></li>
+            <li><a class="resource-link" href="https://huggingface.co/Ethan271/qwen3-4b-safety-midtrain" target="_blank" rel="noreferrer"><img class="brand-icon huggingface-icon" src="static/images/huggingface.svg" alt="">Qwen3-4B Safety Midtrain</a></li>
+            <li><a class="resource-link" href="https://huggingface.co/Ethan271/qwen3-8b-safety-midtrain" target="_blank" rel="noreferrer"><img class="brand-icon huggingface-icon" src="static/images/huggingface.svg" alt="">Qwen3-8B Safety Midtrain</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>
+        Website structure adapted from the
+        <a href="https://github.com/nerfies/nerfies.github.io" target="_blank" rel="noreferrer">Nerfies project page template</a>.
+      </p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
